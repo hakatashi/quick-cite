@@ -59,3 +59,8 @@ typings/
 
 # Yarn lockfile
 yarn.lock
+
+# Built files
+index.html
+index.js
+index.css
