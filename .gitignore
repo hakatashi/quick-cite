@@ -63,4 +63,5 @@ yarn.lock
 # Built files
 index.html
 index.js
+index.js.map
 index.css

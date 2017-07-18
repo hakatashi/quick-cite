@@ -16,6 +16,7 @@ module.exports = (env = {}) => ({
 							targets: [
 								'last 2 Chrome versions',
 							],
+							useBuiltIns: true,
 						}],
 					],
 					plugins: [
