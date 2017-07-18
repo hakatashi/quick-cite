@@ -8,6 +8,7 @@ const qs = require('querystring');
 class Store {
 	constructor() {
 		this.input = '';
+		this.bibinfo = '';
 		this.isInvalid = false;
 
 		this.setInput = this.setInput.bind(this);
@@ -22,7 +23,7 @@ class Store {
 
 	onKeydown(event) {
 		if (event.which === keycode('enter')) {
-			this.fetch();
+			this.processData();
 		}
 	}
 
@@ -30,7 +31,24 @@ class Store {
 		// await next tick
 		await new Promise(setTimeout);
 
-		this.fetch();
+		this.processData();
+	}
+
+	async processData() {
+		const data = await this.fetch();
+		if (data === null) {
+			return;
+		}
+
+		const publisher = data.summary.publisher;
+		const publishDate = new Date(data.summary.pubdate);
+		const collection = data.onix.DescriptiveDetail.Collection.TitleDetail.TitleElement[0].TitleText.content;
+		const title = data.summary.title;
+		const author = data.summary.author;
+
+		// eslint-disable-next-line no-irregular-whitespace
+		this.bibinfo = `${author}　『${title}』　${publisher}〈${collection}〉、${publishDate.getFullYear()}年。`;
+		m.redraw();
 	}
 
 	async fetch() {
@@ -38,7 +56,8 @@ class Store {
 
 		if (match === null) {
 			this.isInvalid = true;
-			return;
+			m.redraw();
+			return null;
 		}
 
 		this.isInvalid = false;
@@ -48,10 +67,10 @@ class Store {
 			method: 'GET',
 			mode: 'cors',
 		});
-		console.log(response);
 
 		const data = await response.json();
-		console.log(data);
+
+		return data[0];
 	}
 }
 
@@ -75,6 +94,11 @@ class App {
 				{this.store.isInvalid && (
 					<p>input is invalid</p>
 				)}
+				<p>
+					<textarea
+						value={this.store.bibinfo}
+					/>
+				</p>
 			</div>
 		);
 	}
